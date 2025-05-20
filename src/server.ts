@@ -21,8 +21,6 @@ app.post("/upload", upload.single("logFile"), (req, res) => {
 
   const parsedData = parseLog(rawLog);
 
-  console.log(parsedData);
-
   fs.unlinkSync(path);
   res.json(parsedData);
 });

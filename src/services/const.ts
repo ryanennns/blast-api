@@ -1,4 +1,6 @@
-export const KILL_FEED_REGEX = /^.*] killed ".*$/gm;
-export const FLASHED_REGEX = /^.*>" blinded for .*$/gm;
-export const THREW_REGEX = /^.*>" threw .*$/gm;
-export const DATETIME_PREFIX_REGEX = /\d{2}\/\d{2}\/\d{4} - \d{2}:\d{2}:\d{2}:/;
+export const KILL_REGEX =
+  /"([^"<]+)<[^>]+><[^>]+><[^>]+>"\s+\[[^\]]+\]\s+killed\s+"([^"<]+)<[^>]+><[^>]+><[^>]+>" \[.*\] with "(.*)"(?: \((headshot)\))?/;
+export const ASSIST_REGEX =
+  /"([^"<]+)<[^>]+><[^>]+><[^>]+>"\s+assisted killing\s+"([^"<]+)<[^>]+><[^>]+><[^>]+>"/;
+export const FLASH_ASSIST_REGEX =
+  /"([^"<]+)<[^>]+><[^>]+><[^>]+>"\s+flash-assisted killing\s+"([^"<]+)<[^>]+><[^>]+><[^>]+>"/;
