@@ -10,6 +10,15 @@ import {
   TERRORIST_TEAM_REGEX,
   TERRORISTS_WIN_INDICATOR,
 } from "./const.ts";
+import {
+  Assist,
+  Half,
+  Kill,
+  Match,
+  Round,
+  ScoreboardRow,
+  TeamRole,
+} from "../../types/core.ts";
 
 const parseKillLog = (line: string): Kill | null => {
   const match = line.match(KILL_REGEX);
@@ -118,12 +127,20 @@ const determineRoundWinner = (
     : { team: "CT", method: ctsWinByKills ? "kills" : "defusal" };
 };
 
-const determineRoundTeams = (round: string[]): Record<TeamRole, string> => {
-  const [_a, ctTeam] = round.join("\n").match(CT_TEAM_REGEX) ?? [];
-  const [_b, terroristTeam] =
-    round.join("\n").match(TERRORIST_TEAM_REGEX) ?? [];
+export const determineRoundTeams = (
+  round: string[],
+): Record<TeamRole, string> => {
+  const text = round.join("\n");
 
-  console.log(round);
+  const ctMatches = [...text.matchAll(CT_TEAM_REGEX)];
+  const terroristMatches = [...text.matchAll(TERRORIST_TEAM_REGEX)];
+
+  const ctTeam = ctMatches.at(-1)?.[1];
+  const terroristTeam = terroristMatches.at(-1)?.[1];
+
+  if (ctTeam === undefined || terroristTeam === undefined) {
+    throw new Error("Unable to determine round teams");
+  }
 
   return {
     T: terroristTeam,
@@ -255,6 +272,8 @@ export const logToHalves = (text: string): Half[] => {
     .map((half: Round[]): Half => {
       const { T, CT } = half[0].teams;
 
+      console.log(JSON.stringify(half.map((h) => h.teams)));
+
       return {
         T,
         CT,
@@ -266,12 +285,6 @@ export const logToHalves = (text: string): Half[] => {
 };
 
 export const logToMatch = (text: string): Match => {
-  const lastMatchStartIndex = text.lastIndexOf("Match_Start");
-  if (lastMatchStartIndex !== -1) {
-    text = text.slice(lastMatchStartIndex);
-    console.log(text[0]);
-  }
-
   const halves = logToHalves(text);
   const winner = determineWinnerByRounds(halves.flatMap((half) => half.rounds));
   const scoreboard = logToScoreboard(text);

@@ -1,25 +1,25 @@
-type TeamRole = "T" | "CT";
+export type TeamRole = "T" | "CT";
 
-interface ScoreboardRow {
+export interface ScoreboardRow {
   kills: number;
   deaths: number;
   assists: number;
   flashAssists: number;
 }
 
-interface Kill {
+export interface Kill {
   killer: string;
   killed: string;
   weapon: string;
   headshot: boolean;
 }
 
-interface Assist {
+export interface Assist {
   assister: string;
   killed: string;
 }
 
-interface Round {
+export interface Round {
   killFeed: Kill[];
   assistFeed: Assist[];
   flashAssistFeed: Assist[];
@@ -33,13 +33,13 @@ interface Round {
   };
 }
 
-type Half = {
+export interface Half {
   T: string;
   CT: string;
   rounds: Round[];
-};
+}
 
-interface Match {
+export interface Match {
   map: string;
   halves: Half[];
   winner: {
