@@ -30,6 +30,8 @@ interface Assist {
   killed: string;
 }
 
+type Team = "T" | "CT";
+
 const parseKillLog = (line: string): Kill | null => {
   const match = line.match(KILL_REGEX);
 
@@ -108,34 +110,6 @@ const scoreboardFromFeeds = (
   return scoreboard;
 };
 
-export const logToScoreboard = (text: string) => {
-  const lastMatchStartIndex = text.lastIndexOf("Match_Start");
-  if (lastMatchStartIndex !== -1) {
-    text = text.slice(lastMatchStartIndex);
-  }
-
-  const logLines = text.split("\n");
-
-  const killFeed = logLines
-    .filter((l) => l.match(KILL_REGEX))
-    .map(parseKillLog)
-    .filter((k) => k !== null);
-
-  const assistFeed = logLines
-    .filter((l) => l.match(ASSIST_REGEX))
-    .map(parseAssistLog)
-    .filter((a) => a !== null);
-
-  const flashAssistFeed = logLines
-    .filter((l) => l.match(FLASH_ASSIST_REGEX))
-    .map(parseFlashAssistLog)
-    .filter((a) => a !== null);
-
-  return scoreboardFromFeeds(killFeed, assistFeed, flashAssistFeed);
-};
-
-type Team = "T" | "CT";
-
 const determineRoundWinner = (
   round: string[],
 ): {
@@ -174,6 +148,32 @@ const determineRoundTeams = (round: string[]): Record<Team, string> => {
     T: terroristTeam,
     CT: ctTeam,
   };
+};
+
+export const logToScoreboard = (text: string) => {
+  const lastMatchStartIndex = text.lastIndexOf("Match_Start");
+  if (lastMatchStartIndex !== -1) {
+    text = text.slice(lastMatchStartIndex);
+  }
+
+  const logLines = text.split("\n");
+
+  const killFeed = logLines
+      .filter((l) => l.match(KILL_REGEX))
+      .map(parseKillLog)
+      .filter((k) => k !== null);
+
+  const assistFeed = logLines
+      .filter((l) => l.match(ASSIST_REGEX))
+      .map(parseAssistLog)
+      .filter((a) => a !== null);
+
+  const flashAssistFeed = logLines
+      .filter((l) => l.match(FLASH_ASSIST_REGEX))
+      .map(parseFlashAssistLog)
+      .filter((a) => a !== null);
+
+  return scoreboardFromFeeds(killFeed, assistFeed, flashAssistFeed);
 };
 
 export const logToRounds = (text: string) => {
