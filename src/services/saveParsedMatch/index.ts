@@ -33,7 +33,8 @@ export const saveParsedMatch = async (match: Match) => {
         });
 
         await prisma.kill.createMany({
-          data: round.killFeed.map(kill => ({
+          data: round.killFeed.map((kill, index) => ({
+            order: index,
             killer: kill.killer,
             killed: kill.killed,
             weapon: kill.weapon,
@@ -43,7 +44,8 @@ export const saveParsedMatch = async (match: Match) => {
         });
 
         await prisma.assist.createMany({
-          data: round.assistFeed.map(assist => ({
+          data: round.assistFeed.map((assist, index) => ({
+            order: index,
             assister: assist.assister,
             killed: assist.killed,
             roundId: dbRound.id,
@@ -51,7 +53,8 @@ export const saveParsedMatch = async (match: Match) => {
         });
 
         await prisma.flashAssist.createMany({
-          data: round.flashAssistFeed.map(assist => ({
+          data: round.flashAssistFeed.map((assist,index) => ({
+            order: index,
             assister: assist.assister,
             killed: assist.killed,
             roundId: dbRound.id,

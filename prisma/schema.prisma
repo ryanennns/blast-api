@@ -40,6 +40,7 @@ model Round {
 }
 
 model Kill {
+  order    Int
   id       String  @id @default(uuid())
   roundId  String
   round    Round   @relation(fields: [roundId], references: [id])
@@ -50,6 +51,7 @@ model Kill {
 }
 
 model Assist {
+  order    Int
   id       String @id @default(uuid())
   roundId  String
   round    Round  @relation(fields: [roundId], references: [id])
@@ -58,6 +60,7 @@ model Assist {
 }
 
 model FlashAssist {
+  order    Int
   id       String @id @default(uuid())
   roundId  String
   round    Round  @relation(fields: [roundId], references: [id])
