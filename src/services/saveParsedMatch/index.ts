@@ -1,8 +1,8 @@
-import { PrismaClient } from "../../../prisma/generated/prisma/default";
-import { Match } from "../../types/core.ts";
+import {PrismaClient} from "../../../prisma/generated/prisma/default";
+import {Match} from "../../types/core.ts";
 
+const prisma = new PrismaClient();
 export const saveParsedMatch = async (match: Match) => {
-  const prisma = new PrismaClient();
 
   const dbMatch = await prisma.match.create({
     data: {
@@ -32,37 +32,31 @@ export const saveParsedMatch = async (match: Match) => {
           },
         });
 
-        for (const kill of round.killFeed) {
-          await prisma.kill.create({
-            data: {
-              killer: kill.killer,
-              killed: kill.killed,
-              weapon: kill.weapon,
-              headshot: kill.headshot,
-              roundId: dbRound.id,
-            },
-          });
-        }
+        await prisma.kill.createMany({
+          data: round.killFeed.map(kill => ({
+            killer: kill.killer,
+            killed: kill.killed,
+            weapon: kill.weapon,
+            headshot: kill.headshot,
+            roundId: dbRound.id,
+          })),
+        });
 
-        for (const assist of round.assistFeed) {
-          await prisma.assist.create({
-            data: {
-              assister: assist.assister,
-              killed: assist.killed,
-              roundId: dbRound.id,
-            },
-          });
-        }
+        await prisma.assist.createMany({
+          data: round.assistFeed.map(assist => ({
+            assister: assist.assister,
+            killed: assist.killed,
+            roundId: dbRound.id,
+          })),
+        });
 
-        for (const flashAssist of round.flashAssistFeed) {
-          await prisma.flashAssist.create({
-            data: {
-              assister: flashAssist.assister,
-              killed: flashAssist.killed,
-              roundId: dbRound.id,
-            },
-          });
-        }
+        await prisma.flashAssist.createMany({
+          data: round.flashAssistFeed.map(assist => ({
+            assister: assist.assister,
+            killed: assist.killed,
+            roundId: dbRound.id,
+          })),
+        });
       }
     }
   } catch (error) {
