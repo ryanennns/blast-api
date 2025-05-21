@@ -13,11 +13,11 @@ export const getMatch = async (req: Request, res: Response) => {
     res.status(404).json({ error: "Match not found" });
   }
 
-  const roundCount = await prisma.round.count({
+  const round_count = await prisma.round.count({
     where: { matchId: uuid },
   });
 
-  res.json({ match: { ...match, roundCount } });
+  res.json({ match: { ...match, round_count } });
 };
 
 export const getMatchRounds = async (req: Request, res: Response) => {
@@ -47,7 +47,7 @@ export const getMatchHalves = async (req: Request, res: Response) => {
 
   const mappedHalves = await Promise.all(
     halves.map(async (half) => {
-      const roundCount = await prisma.round.count({
+      const round_count = await prisma.round.count({
         where: {
           halfId: half.id,
         },
@@ -55,7 +55,7 @@ export const getMatchHalves = async (req: Request, res: Response) => {
 
       return {
         ...half,
-        roundCount,
+        roundCount: round_count,
       };
     }),
   );
