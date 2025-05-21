@@ -2,6 +2,13 @@ import type { Request, Response } from "express";
 import { PrismaClient } from "../../prisma/generated/prisma/default";
 
 const prisma = new PrismaClient();
+
+export const listMatches = async (req: Request, res: Response) => {
+  const matches = await prisma.match.findMany({});
+
+  res.json({ matches });
+};
+
 export const getMatch = async (req: Request, res: Response) => {
   const { uuid } = req.params;
 
@@ -36,10 +43,37 @@ export const getMatch = async (req: Request, res: Response) => {
   res.json({ match: { ...match, scoreboard, round_count } });
 };
 
+export const getMatchKills = async (req: Request, res: Response) => {
+  const kills = await prisma.kill.findMany({
+    where: {
+      round: {
+        matchId: req.params.uuid,
+      },
+    },
+  });
+
+  if (!kills) {
+    res.status(404).json({ error: "Kills not found" });
+  }
+
+  res.send({ kills });
+};
+
 export const getMatchRounds = async (req: Request, res: Response) => {
   const rounds = await prisma.round.findMany({
     where: {
       matchId: req.params.uuid,
+    },
+    include: {
+      kills: {
+        select: {
+          killer: true,
+          killed: true,
+          weapon: true,
+          headshot: true,
+          order: true,
+        },
+      },
     },
   });
 

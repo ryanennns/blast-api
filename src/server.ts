@@ -7,7 +7,8 @@ import { saveParsedMatch } from "./services/saveParsedMatch";
 import {
   getMatch,
   getMatchHalves,
-  getMatchRounds,
+  getMatchKills,
+  getMatchRounds, listMatches,
 } from "./controllers/matches.controller";
 
 const app = express();
@@ -36,7 +37,9 @@ app.post("/upload", upload.single("logFile"), async (req, res) => {
     : res.status(500).json({ error: "Failed to save match" });
 });
 
+app.get("/matches", listMatches);
 app.get("/matches/:uuid", getMatch);
+app.get("/matches/:uuid/kills", getMatchKills);
 app.get("/matches/:uuid/rounds", getMatchRounds);
 app.get("/matches/:uuid/halves", getMatchHalves);
 
