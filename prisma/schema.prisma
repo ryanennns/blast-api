@@ -26,12 +26,41 @@ model Half {
 }
 
 model Round {
-  id        String @id @default(uuid())
-  number    Int
-  winner    String
-  matchId   String
-  match     Match  @relation(fields: [matchId], references: [id])
-  halfId    String
-  half      Half   @relation(fields: [halfId], references: [id])
-  winMethod String
+  id           String        @id @default(uuid())
+  number       Int
+  winner       String
+  matchId      String
+  match        Match         @relation(fields: [matchId], references: [id])
+  halfId       String
+  half         Half          @relation(fields: [halfId], references: [id])
+  winMethod    String
+  kills        Kill[]
+  assists      Assist[]
+  flashAssists FlashAssist[]
+}
+
+model Kill {
+  id       String  @id @default(uuid())
+  roundId  String
+  round    Round   @relation(fields: [roundId], references: [id])
+  killer   String
+  killed   String
+  weapon   String
+  headshot Boolean
+}
+
+model Assist {
+  id       String @id @default(uuid())
+  roundId  String
+  round    Round  @relation(fields: [roundId], references: [id])
+  assister String
+  killed   String
+}
+
+model FlashAssist {
+  id       String @id @default(uuid())
+  roundId  String
+  round    Round  @relation(fields: [roundId], references: [id])
+  assister String
+  killed   String
 }

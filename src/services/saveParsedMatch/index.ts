@@ -22,7 +22,7 @@ export const saveParsedMatch = async (match: Match) => {
       });
 
       for (const round of half.rounds) {
-        await prisma.round.create({
+        let dbRound = await prisma.round.create({
           data: {
             number: round.number,
             winner: round.roundWinner.team,
@@ -31,6 +31,38 @@ export const saveParsedMatch = async (match: Match) => {
             halfId: dbHalf.id,
           },
         });
+
+        for (const kill of round.killFeed) {
+          await prisma.kill.create({
+            data: {
+              killer: kill.killer,
+              killed: kill.killed,
+              weapon: kill.weapon,
+              headshot: kill.headshot,
+              roundId: dbRound.id,
+            },
+          });
+        }
+
+        for (const assist of round.assistFeed) {
+          await prisma.assist.create({
+            data: {
+              assister: assist.assister,
+              killed: assist.killed,
+              roundId: dbRound.id,
+            },
+          });
+        }
+
+        for (const flashAssist of round.flashAssistFeed) {
+          await prisma.flashAssist.create({
+            data: {
+              assister: flashAssist.assister,
+              killed: flashAssist.killed,
+              roundId: dbRound.id,
+            },
+          });
+        }
       }
     }
   } catch (error) {
