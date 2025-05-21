@@ -24,10 +24,10 @@ yarn-error.log*
 .idea/*
 uploads/*
 
-# lol
 /NAVIvsVitaGF-Nuke.txt
 /tinker.ts
 generated/primsa/
 prisma/dev.db
 prisma/dev.db-journal
 /prisma/generated/
+.env
