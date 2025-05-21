@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import multer from "multer";
 import * as fs from "node:fs";
-import {logToRounds, logToScoreboard} from "./services/logParser";
+import { logToRounds, logToScoreboard } from "./services/logParser";
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
@@ -23,7 +23,7 @@ app.post("/upload", upload.single("logFile"), (req, res) => {
   const halves = logToRounds(rawLog);
 
   fs.unlinkSync(path);
-  res.json({ scoreboard , halves});
+  res.json({ scoreboard, halves });
 });
 
 app.listen(3001, () => {

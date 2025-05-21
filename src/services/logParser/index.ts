@@ -192,6 +192,12 @@ export const logToRounds = (text: string) => {
         .filter((r) => !r.includes("Game Over") && r.includes("Round_Start")),
     );
 
+  if (halves.length !== 2) {
+    throw new Error(
+      "Log could not be parsed into two halves; please check source.",
+    );
+  }
+
   const mappedRounds = halves.map((half) => {
     return half.map((round) => {
       const roundLogLines = round.split("\n");
@@ -223,8 +229,6 @@ export const logToRounds = (text: string) => {
       };
     });
   });
-
-  console.log(JSON.stringify(mappedRounds));
 
   return mappedRounds;
 };
