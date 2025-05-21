@@ -9,11 +9,12 @@ datasource db {
 }
 
 model Match {
-  id     String  @id @default(uuid())
-  map    String
-  rounds Round[]
-  halves Half[]
-  winner String
+  id         String      @id @default(uuid())
+  map        String
+  rounds     Round[]
+  halves     Half[]
+  winner     String
+  scoreboard Scoreboard?
 }
 
 model Half {
@@ -66,4 +67,22 @@ model FlashAssist {
   round    Round  @relation(fields: [roundId], references: [id])
   assister String
   killed   String
+}
+
+model Scoreboard {
+  id             String          @id @default(uuid())
+  scoreboardRows ScoreboardRow[]
+  matchId        String          @unique
+  match          Match?          @relation(fields: [matchId], references: [id])
+}
+
+model ScoreboardRow {
+  id           String     @id @default(uuid())
+  player       String
+  kills        Int
+  deaths       Int
+  assists      Int
+  flashAssists Int
+  scoreboardId String
+  scoreboard   Scoreboard @relation(fields: [scoreboardId], references: [id])
 }

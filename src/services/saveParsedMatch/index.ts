@@ -14,6 +14,23 @@ export const saveParsedMatch = async (match: Match): Promise<string | null> => {
         },
       });
 
+      const dbScoreboard = await tx.scoreboard.create({
+        data: {
+          matchId: dbMatch.id,
+        },
+      });
+
+      await tx.scoreboardRow.createMany({
+        data: Object.entries(match.scoreboard).map(([player, stats]) => ({
+          player,
+          kills: stats.kills,
+          deaths: stats.deaths,
+          assists: stats.assists,
+          flashAssists: stats.flashAssists,
+          scoreboardId: dbScoreboard.id,
+        })),
+      });
+
       matchId = dbMatch.id;
 
       for (const half of match.halves) {
