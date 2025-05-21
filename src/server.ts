@@ -4,7 +4,7 @@ import multer from "multer";
 import * as fs from "node:fs";
 import { logToMatch } from "./services/logParser";
 import { saveParsedMatch } from "./services/saveParsedMatch";
-import { getMatch, getMatchRounds } from "./controllers/matches.controller.ts";
+import { getMatch, getMatchRounds } from "./controllers/matches.controller";
 
 const app = express();
 const upload = multer({ dest: "uploads/" });

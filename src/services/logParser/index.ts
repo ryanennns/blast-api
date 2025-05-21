@@ -9,7 +9,7 @@ import {
   TARGET_BOMBED_INDICATOR,
   TERRORIST_TEAM_REGEX,
   TERRORISTS_WIN_INDICATOR,
-} from "./const.ts";
+} from "./const";
 import {
   Assist,
   Half,
@@ -18,7 +18,7 @@ import {
   Round,
   ScoreboardRow,
   TeamRole,
-} from "../../types/core.ts";
+} from "../../types/core";
 
 const parseKillLog = (line: string): Kill | null => {
   const match = line.match(KILL_REGEX);

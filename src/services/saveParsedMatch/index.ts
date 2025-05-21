@@ -1,5 +1,5 @@
 import { PrismaClient } from "../../../prisma/generated/prisma/default";
-import { Match } from "../../types/core.ts";
+import { Match } from "../../types/core";
 
 const prisma = new PrismaClient();
 export const saveParsedMatch = async (match: Match): Promise<string | null> => {

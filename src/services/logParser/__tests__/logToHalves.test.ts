@@ -1,4 +1,4 @@
-import { logToHalves } from "../index.ts";
+import { logToHalves } from "../index";
 
 const targetBombed = `11/28/2021 - 20:05:53: Team "TERRORIST" triggered "SFUI_Notice_Target_Bombed" (CT "6") (T "1")`;
 const bombDefused = `11/28/2021 - 20:45:36: Team "CT" triggered "SFUI_Notice_Bomb_Defused" (CT "2") (T "0")`;

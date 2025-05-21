@@ -1,4 +1,4 @@
-import { determineRoundTeams } from "../index.ts";
+import { determineRoundTeams } from "../index";
 
 const theBadRound = `
 11/28/2021 - 21:12:27: World triggered "Round_End"

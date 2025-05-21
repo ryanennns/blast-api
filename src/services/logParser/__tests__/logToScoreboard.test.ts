@@ -1,5 +1,5 @@
 import fs from "fs";
-import { logToScoreboard } from "../index.ts";
+import { logToScoreboard } from "../index";
 
 const log = fs.readFileSync(
   "./src/services/logParser/__tests__/fixtures/NAVIvsVitaGF-Nuke.txt",

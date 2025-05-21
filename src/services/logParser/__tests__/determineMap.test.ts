@@ -1,4 +1,4 @@
-import { determineMap } from "../index.ts";
+import { determineMap } from "../index";
 
 describe("determineMap", () => {
   it("should throw if no map name found", () => {
