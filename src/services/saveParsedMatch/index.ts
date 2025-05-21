@@ -12,15 +12,26 @@ export const saveParsedMatch = async (match: Match) => {
   });
 
   try {
-    for (const round of match.halves.flatMap((half) => half.rounds)) {
-      await prisma.round.create({
+    for (const half of match.halves) {
+      const dbHalf = await prisma.half.create({
         data: {
-          number: round.number,
-          winner: round.roundWinner.team,
-          winMethod: round.roundWinner.method,
+          terroristTeam: half.T,
+          ctTeam: half.CT,
           matchId: dbMatch.id,
         },
       });
+
+      for (const round of half.rounds) {
+        await prisma.round.create({
+          data: {
+            number: round.number,
+            winner: round.roundWinner.team,
+            winMethod: round.roundWinner.method,
+            matchId: dbMatch.id,
+            halfId: dbHalf.id,
+          },
+        });
+      }
     }
   } catch (error) {
     console.error("Error saving match:", error);
