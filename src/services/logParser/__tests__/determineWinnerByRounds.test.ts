@@ -1,9 +1,11 @@
 import { determineWinnerByRounds } from "../index.ts";
+import {Round} from "../../../types/core.ts";
 
 describe("determineWinnerByRounds", () => {
   it("should throw if more than two teams are found", () => {
     const rounds: Round[] = [
       {
+        number: 0,
         teams: {
           T: "Team One",
           CT: "Team Two",
@@ -17,6 +19,7 @@ describe("determineWinnerByRounds", () => {
         flashAssistFeed: [],
       },
       {
+        number: 1,
         teams: {
           T: "Team Three",
           CT: "Team Four",
@@ -39,6 +42,7 @@ describe("determineWinnerByRounds", () => {
   it("should throw if less than two teams are found", () => {
     const rounds: Round[] = [
       {
+        number: 0,
         teams: {
           T: "Team One",
           CT: "Team One",
@@ -63,6 +67,7 @@ describe("determineWinnerByRounds", () => {
     const teamTwo = "Team Two";
     const rounds: Round[] = [
       {
+        number: 0,
         teams: {
           T: teamOne,
           CT: teamTwo,
@@ -76,6 +81,7 @@ describe("determineWinnerByRounds", () => {
         flashAssistFeed: [],
       },
       {
+        number: 1,
         teams: {
           T: teamOne,
           CT: teamTwo,
@@ -89,6 +95,7 @@ describe("determineWinnerByRounds", () => {
         flashAssistFeed: [],
       },
       {
+        number: 2,
         teams: {
           T: teamTwo,
           CT: teamOne,
