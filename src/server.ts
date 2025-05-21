@@ -22,10 +22,13 @@ app.post("/upload", upload.single("logFile"), async (req, res) => {
 
   const match = logToMatch(rawLog);
 
-  await saveParsedMatch(match);
+  const savedSuccessfully = await saveParsedMatch(match);
 
   fs.unlinkSync(path);
-  res.json({ match });
+
+  savedSuccessfully
+    ? res.json({ match })
+    : res.status(500).json({ error: "Failed to save match" });
 });
 
 app.listen(3900, () => {
