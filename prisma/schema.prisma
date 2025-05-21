@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
   output   = "./generated/prisma"
@@ -12,37 +9,61 @@ datasource db {
 }
 
 model Match {
-  id        String    @id @default(uuid())
-  createdAt DateTime  @default(now())
-  map       String
-  rounds    Round[]
-  players   Player[]
+  id     String  @id @default(uuid())
+  map    String
+  rounds Round[]
+  halves Half[]
+  winner String
+}
+
+model Half {
+  id            String  @id @default(uuid())
+  matchId       String
+  match         Match   @relation(fields: [matchId], references: [id])
+  terroristTeam String
+  ctTeam        String
+  rounds        Round[]
 }
 
 model Round {
-  id        String    @id @default(uuid())
-  number    Int
-  winner    String    // 'T' or 'CT'
-  winMethod String
-  match     Match     @relation(fields: [matchId], references: [id])
-  matchId   String
-  events    Event[]
+  id           String        @id @default(uuid())
+  number       Int
+  winner       String
+  matchId      String
+  match        Match         @relation(fields: [matchId], references: [id])
+  halfId       String
+  half         Half          @relation(fields: [halfId], references: [id])
+  winMethod    String
+  kills        Kill[]
+  assists      Assist[]
+  flashAssists FlashAssist[]
 }
 
-model Event {
-  id         String    @id @default(uuid())
-  type       String    // "kill", "flash", "grenade", etc.
-  timestamp  DateTime
-  description String
-  round      Round     @relation(fields: [roundId], references: [id])
-  roundId    String
+model Kill {
+  order    Int
+  id       String  @id @default(uuid())
+  roundId  String
+  round    Round   @relation(fields: [roundId], references: [id])
+  killer   String
+  killed   String
+  weapon   String
+  headshot Boolean
 }
 
-model Player {
-  id        String    @id @default(uuid())
-  name      String
-  steamId   String
-  team      String     // "T" or "CT"
-  match     Match      @relation(fields: [matchId], references: [id])
-  matchId   String
+model Assist {
+  order    Int
+  id       String @id @default(uuid())
+  roundId  String
+  round    Round  @relation(fields: [roundId], references: [id])
+  assister String
+  killed   String
+}
+
+model FlashAssist {
+  order    Int
+  id       String @id @default(uuid())
+  roundId  String
+  round    Round  @relation(fields: [roundId], references: [id])
+  assister String
+  killed   String
 }
