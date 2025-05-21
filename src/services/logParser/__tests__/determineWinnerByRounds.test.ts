@@ -1,5 +1,5 @@
 import { determineWinnerByRounds } from "../index.ts";
-import {Round} from "../../../types/core.ts";
+import { Round } from "../../../types/core.ts";
 
 describe("determineWinnerByRounds", () => {
   it("should throw if more than two teams are found", () => {

@@ -1,4 +1,4 @@
-import {logToHalves} from "../index.ts";
+import { logToHalves } from "../index.ts";
 
 const targetBombed = `11/28/2021 - 20:05:53: Team "TERRORIST" triggered "SFUI_Notice_Target_Bombed" (CT "6") (T "1")`;
 const bombDefused = `11/28/2021 - 20:45:36: Team "CT" triggered "SFUI_Notice_Bomb_Defused" (CT "2") (T "0")`;
@@ -10,13 +10,13 @@ const ctTeam = "TeamVitality";
 const teamInitializer = `
 11/28/2021 - 20:45:36: MatchStatus: Team playing "CT": ${ctTeam}
 11/28/2021 - 20:45:36: MatchStatus: Team playing "TERRORIST": ${terroristTeam}
-`
+`;
 
 describe("logToRounds", () => {
   it("should throw if no Match_Start is found", () => {
     const invalidLog = "snickers not a log";
     expect(() => logToHalves(invalidLog)).toThrow(
-        "Match_Start not found in log",
+      "Match_Start not found in log",
     );
   });
 
@@ -34,7 +34,7 @@ describe("logToRounds", () => {
       `;
 
     expect(() => logToHalves(log)).toThrow(
-        "Log could not be parsed into two halves; please check source.",
+      "Log could not be parsed into two halves; please check source.",
     );
   });
 
@@ -47,7 +47,7 @@ describe("logToRounds", () => {
       `;
 
     expect(() => logToHalves(log)).toThrow(
-        "Log could not be parsed into two halves; please check source.",
+      "Log could not be parsed into two halves; please check source.",
     );
   });
 
@@ -113,14 +113,14 @@ describe("logToRounds", () => {
   });
 
   it.each([
-    {method: targetBombed, expectedWinner: "T", expectedMethod: "bomb"},
-    {method: bombDefused, expectedWinner: "CT", expectedMethod: "defusal"},
-    {method: ctsWin, expectedWinner: "CT", expectedMethod: "kills"},
-    {method: tsWin, expectedWinner: "T", expectedMethod: "kills"},
+    { method: targetBombed, expectedWinner: "T", expectedMethod: "bomb" },
+    { method: bombDefused, expectedWinner: "CT", expectedMethod: "defusal" },
+    { method: ctsWin, expectedWinner: "CT", expectedMethod: "kills" },
+    { method: tsWin, expectedWinner: "T", expectedMethod: "kills" },
   ])(
-      "should parse round winner correctly",
-      ({method, expectedWinner, expectedMethod}) => {
-        const log = `
+    "should parse round winner correctly",
+    ({ method, expectedWinner, expectedMethod }) => {
+      const log = `log
       11/28/2021 - 20:00:23: World triggered "Match_Start" on "de_nuke"
       11/28/2021 - 20:01:08: World triggered "Round_Start"
       ${teamInitializer}
@@ -133,16 +133,16 @@ describe("logToRounds", () => {
       11/28/2021 - 20:06:22: World triggered "Round_End"
     `;
 
-        const halves = logToHalves(log);
+      const halves = logToHalves(log);
 
-        expect(halves).toHaveLength(2);
+      expect(halves).toHaveLength(2);
 
-        const firstRound = halves[0].rounds[0];
-        expect(firstRound.roundWinner).toEqual({
-          team: expectedWinner,
-          method: expectedMethod,
-        });
-      },
+      const firstRound = halves[0].rounds[0];
+      expect(firstRound.roundWinner).toEqual({
+        team: expectedWinner,
+        method: expectedMethod,
+      });
+    },
   );
 
   it("should parse team names correctly", () => {
