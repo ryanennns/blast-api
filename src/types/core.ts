@@ -1,6 +1,8 @@
 export type TeamRole = "T" | "CT";
 
 export interface ScoreboardRow {
+  player: string;
+  team: string;
   kills: number;
   deaths: number;
   assists: number;
@@ -12,6 +14,7 @@ export interface Kill {
   killed: string;
   weapon: string;
   headshot: boolean;
+  killerSide: TeamRole;
 }
 
 export interface Assist {
@@ -46,5 +49,5 @@ export interface Match {
   winner: {
     team: string;
   };
-  scoreboard: Record<string, ScoreboardRow>;
+  scoreboard: ScoreboardRow[];
 }

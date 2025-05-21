@@ -21,12 +21,8 @@ export const saveParsedMatch = async (match: Match): Promise<string | null> => {
       });
 
       await tx.scoreboardRow.createMany({
-        data: Object.entries(match.scoreboard).map(([player, stats]) => ({
-          player,
-          kills: stats.kills,
-          deaths: stats.deaths,
-          assists: stats.assists,
-          flashAssists: stats.flashAssists,
+        data: match.scoreboard.map((scoreboardRow) => ({
+          ...scoreboardRow,
           scoreboardId: dbScoreboard.id,
         })),
       });

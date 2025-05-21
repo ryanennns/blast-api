@@ -24,7 +24,7 @@ const parseKillLog = (line: string): Kill | null => {
   const match = line.match(KILL_REGEX);
 
   if (match) {
-    const [_, killer, killed, weapon, headshot] = match;
+    const [_, killer, side, killed, weapon, headshot] = match;
 
     // shox has forced me to trim these names :|
     return {
@@ -32,6 +32,7 @@ const parseKillLog = (line: string): Kill | null => {
       killed: killed.trim(),
       weapon,
       headshot: !!headshot,
+      killerSide: side === "TERRORIST" ? "T" : "CT",
     };
   }
 
@@ -62,40 +63,61 @@ const parseFlashAssistLog = (line: string): Assist | null => {
   return null;
 };
 
+interface KillFeedItem {
+  killer: string;
+  killed: string;
+  weapon: string;
+  headshot: boolean;
+  killerTeam: string;
+  killedTeam: string;
+}
+
 const scoreboardFromFeeds = (
-  killFeed: Kill[],
+  killFeed: KillFeedItem[],
   assistFeed: Assist[],
   flashAssistFeed: Assist[],
-): Record<string, ScoreboardRow> => {
-  const scoreboard: Record<string, ScoreboardRow> = {};
+): ScoreboardRow[] => {
+  const scoreboardMap = new Map<string, ScoreboardRow>();
 
-  const players = new Set<string>();
-  killFeed.forEach(({ killer, killed }) => {
-    players.add(killer);
-    players.add(killed);
+  console.log(killFeed);
+  killFeed.forEach(({ killer, killed, killerTeam, killedTeam }) => {
+    if (!scoreboardMap.has(killer)) {
+      scoreboardMap.set(killer, {
+        player: killer,
+        team: killerTeam,
+        kills: 0,
+        deaths: 0,
+        assists: 0,
+        flashAssists: 0,
+      });
+    }
+
+    if (!scoreboardMap.has(killed)) {
+      scoreboardMap.set(killed, {
+        player: killed,
+        team: killedTeam,
+        kills: 0,
+        deaths: 0,
+        assists: 0,
+        flashAssists: 0,
+      });
+    }
+
+    scoreboardMap.get(killer)!.kills += 1;
+    scoreboardMap.get(killed)!.deaths += 1;
   });
 
-  players.forEach((username) => {
-    scoreboard[username] = {
-      kills: 0,
-      deaths: 0,
-      assists: 0,
-      flashAssists: 0,
-    };
+  assistFeed.forEach(({ assister }) => {
+    if (!scoreboardMap.has(assister)) return;
+    scoreboardMap.get(assister)!.assists += 1;
   });
 
-  killFeed.forEach((kill) => {
-    scoreboard[kill.killer].kills += 1;
-    scoreboard[kill.killed].deaths += 1;
+  flashAssistFeed.forEach(({ assister }) => {
+    if (!scoreboardMap.has(assister)) return;
+    scoreboardMap.get(assister)!.flashAssists += 1;
   });
 
-  assistFeed.forEach(({ assister }) => (scoreboard[assister].assists += 1));
-
-  flashAssistFeed.forEach(
-    ({ assister }) => (scoreboard[assister].flashAssists += 1),
-  );
-
-  return scoreboard;
+  return Array.from(scoreboardMap.values());
 };
 
 const determineRoundWinner = (
@@ -195,12 +217,35 @@ export const logToScoreboard = (text: string) => {
     text = text.slice(lastMatchStartIndex);
   }
 
-  const logLines = text.split("\n");
+  let halves = baseParsing(text);
 
-  const killFeed = logLines
-    .filter((l) => l.match(KILL_REGEX))
-    .map(parseKillLog)
-    .filter((k) => k !== null);
+  let killFeed: KillFeedItem[] = [];
+
+  halves.forEach((half) => {
+    half.forEach((round) => {
+      const roundLines = round.split("\n");
+
+      const teams = determineRoundTeams(roundLines);
+
+      const temp = roundLines
+        .filter((l) => l.match(KILL_REGEX))
+        .map(parseKillLog)
+        .filter((k) => k !== null);
+
+      killFeed.push(
+        ...temp.map((kill: Kill) => {
+          const killedSide = kill.killerSide === "T" ? "CT" : "T";
+          return {
+            ...kill,
+            killerTeam: teams[kill.killerSide],
+            killedTeam: teams[killedSide],
+          };
+        }),
+      );
+    });
+  });
+
+  const logLines = text.split("\n");
 
   const assistFeed = logLines
     .filter((l) => l.match(ASSIST_REGEX))
@@ -215,7 +260,7 @@ export const logToScoreboard = (text: string) => {
   return scoreboardFromFeeds(killFeed, assistFeed, flashAssistFeed);
 };
 
-export const logToHalves = (text: string): Half[] => {
+const baseParsing = (text: string): string[][] => {
   const lastMatchStartIndex = text.lastIndexOf("Match_Start");
 
   if (lastMatchStartIndex === -1) {
@@ -223,13 +268,17 @@ export const logToHalves = (text: string): Half[] => {
   }
   text = text.slice(lastMatchStartIndex);
 
-  let halves = text
+  return text
     .split(HALFTIME_REGEX)
     .map((half) =>
       half
         .split(/.*Round_End.*/g)
         .filter((r) => !r.includes("Game Over") && r.includes("Round_Start")),
     );
+};
+
+export const logToHalves = (text: string): Half[] => {
+  let halves = baseParsing(text);
 
   if (halves.length !== 2) {
     throw new Error(

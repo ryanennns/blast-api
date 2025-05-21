@@ -99,6 +99,7 @@ describe("logToRounds", () => {
       killed: "Kyojin",
       weapon: "deagle",
       headshot: false,
+      killerSide: "T",
     });
 
     expect(firstRound.assistFeed[0]).toEqual({
