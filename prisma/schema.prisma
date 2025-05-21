@@ -79,6 +79,7 @@ model Scoreboard {
 model ScoreboardRow {
   id           String     @id @default(uuid())
   player       String
+  team         String     @default("")
   kills        Int
   deaths       Int
   assists      Int

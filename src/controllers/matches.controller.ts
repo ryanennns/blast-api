@@ -23,6 +23,7 @@ export const getMatch = async (req: Request, res: Response) => {
       scoreboardRows: {
         select: {
           player: true,
+          team: true,
           kills: true,
           deaths: true,
           assists: true,
