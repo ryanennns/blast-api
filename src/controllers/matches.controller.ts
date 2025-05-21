@@ -27,5 +27,40 @@ export const getMatchRounds = async (req: Request, res: Response) => {
     },
   });
 
+  if (!rounds) {
+    res.status(404).json({ error: "Rounds not found" });
+  }
+
   res.send({ rounds });
+};
+
+export const getMatchHalves = async (req: Request, res: Response) => {
+  const halves = await prisma.half.findMany({
+    where: {
+      matchId: req.params.uuid,
+    },
+  });
+
+  if (!halves) {
+    res.status(404).json({ error: "Halves not found" });
+  }
+
+  const mappedHalves = await Promise.all(
+    halves.map(async (half) => {
+      const roundCount = await prisma.round.count({
+        where: {
+          halfId: half.id,
+        },
+      });
+
+      return {
+        ...half,
+        roundCount,
+      };
+    }),
+  );
+
+  console.log(mappedHalves);
+
+  res.send({ halves: mappedHalves });
 };

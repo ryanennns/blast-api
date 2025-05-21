@@ -66,7 +66,6 @@ export const saveParsedMatch = async (match: Match): Promise<string | null> => {
           });
         }
       }
-
     });
   } catch (error) {
     console.error("Error saving match:", error);

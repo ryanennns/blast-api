@@ -4,7 +4,11 @@ import multer from "multer";
 import * as fs from "node:fs";
 import { logToMatch } from "./services/logParser";
 import { saveParsedMatch } from "./services/saveParsedMatch";
-import { getMatch, getMatchRounds } from "./controllers/matches.controller";
+import {
+  getMatch,
+  getMatchHalves,
+  getMatchRounds,
+} from "./controllers/matches.controller";
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
@@ -34,6 +38,7 @@ app.post("/upload", upload.single("logFile"), async (req, res) => {
 
 app.get("/matches/:uuid", getMatch);
 app.get("/matches/:uuid/rounds", getMatchRounds);
+app.get("/matches/:uuid/halves", getMatchHalves);
 
 app.listen(3900, () => {
   console.log("Server running on http://0.0.0.0:3900");
