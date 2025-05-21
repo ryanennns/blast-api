@@ -2,7 +2,7 @@ import { PrismaClient } from "../../../prisma/generated/prisma/default";
 import { Match } from "../../types/core.ts";
 
 const prisma = new PrismaClient();
-export const saveParsedMatch = async (match: Match): Promise<boolean> => {
+export const saveParsedMatch = async (match: Match): Promise<string | null> => {
   try {
     await prisma.$transaction(async (tx) => {
       const dbMatch = await tx.match.create({
@@ -61,12 +61,12 @@ export const saveParsedMatch = async (match: Match): Promise<boolean> => {
           });
         }
       }
-    });
 
-    return true;
+      return dbMatch.id;
+    });
   } catch (error) {
     console.error("Error saving match:", error);
   }
 
-  return false;
+  return null;
 };

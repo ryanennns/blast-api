@@ -4,7 +4,7 @@ import multer from "multer";
 import * as fs from "node:fs";
 import { logToMatch } from "./services/logParser";
 import { saveParsedMatch } from "./services/saveParsedMatch";
-import {getMatch, getMatchRounds} from "./controllers/matches.controller.ts";
+import { getMatch, getMatchRounds } from "./controllers/matches.controller.ts";
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
@@ -23,12 +23,12 @@ app.post("/upload", upload.single("logFile"), async (req, res) => {
 
   const match = logToMatch(rawLog);
 
-  const savedSuccessfully = await saveParsedMatch(match);
+  const match_id = await saveParsedMatch(match);
 
   fs.unlinkSync(path);
 
-  savedSuccessfully
-    ? res.json({ match })
+  match_id
+    ? res.json({ match_id })
     : res.status(500).json({ error: "Failed to save match" });
 });
 
