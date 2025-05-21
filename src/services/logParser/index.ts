@@ -131,30 +131,20 @@ const determineRoundTeams = (round: string[]): Record<TeamRole, string> => {
   };
 };
 
-export const logToScoreboard = (text: string) => {
-  const lastMatchStartIndex = text.lastIndexOf("Match_Start");
-  if (lastMatchStartIndex !== -1) {
-    text = text.slice(lastMatchStartIndex);
+export const determineMap = (text: string): string => {
+  const matches = [
+    ...text.matchAll(/World triggered "Match_Start" on "(.*)"/g),
+  ];
+
+  const mapName = matches.at(-1)?.[1];
+
+  if (matches.length < 1 || mapName === undefined) {
+    throw new Error(
+      "Could not find map name in log. Please check the log format.",
+    );
   }
 
-  const logLines = text.split("\n");
-
-  const killFeed = logLines
-    .filter((l) => l.match(KILL_REGEX))
-    .map(parseKillLog)
-    .filter((k) => k !== null);
-
-  const assistFeed = logLines
-    .filter((l) => l.match(ASSIST_REGEX))
-    .map(parseAssistLog)
-    .filter((a) => a !== null);
-
-  const flashAssistFeed = logLines
-    .filter((l) => l.match(FLASH_ASSIST_REGEX))
-    .map(parseFlashAssistLog)
-    .filter((a) => a !== null);
-
-  return scoreboardFromFeeds(killFeed, assistFeed, flashAssistFeed);
+  return mapName;
 };
 
 export const determineWinnerByRounds = (rounds: Round[]) => {
@@ -182,18 +172,30 @@ export const determineWinnerByRounds = (rounds: Round[]) => {
   return winner;
 };
 
-export const logToMatch = (text: string): Match => {
-  const halves = logToHalves(text);
-  const winner = determineWinnerByRounds(halves.flatMap((half) => half.rounds));
-  const scoreboard = logToScoreboard(text);
+export const logToScoreboard = (text: string) => {
+  const lastMatchStartIndex = text.lastIndexOf("Match_Start");
+  if (lastMatchStartIndex !== -1) {
+    text = text.slice(lastMatchStartIndex);
+  }
 
-  return {
-    halves,
-    winner: {
-      team: winner,
-    },
-    scoreboard,
-  };
+  const logLines = text.split("\n");
+
+  const killFeed = logLines
+    .filter((l) => l.match(KILL_REGEX))
+    .map(parseKillLog)
+    .filter((k) => k !== null);
+
+  const assistFeed = logLines
+    .filter((l) => l.match(ASSIST_REGEX))
+    .map(parseAssistLog)
+    .filter((a) => a !== null);
+
+  const flashAssistFeed = logLines
+    .filter((l) => l.match(FLASH_ASSIST_REGEX))
+    .map(parseFlashAssistLog)
+    .filter((a) => a !== null);
+
+  return scoreboardFromFeeds(killFeed, assistFeed, flashAssistFeed);
 };
 
 export const logToHalves = (text: string): Half[] => {
@@ -219,7 +221,7 @@ export const logToHalves = (text: string): Half[] => {
   }
 
   const mappedRounds: Half[] = halves
-    .map((half) =>
+    .map((half: string[]) =>
       half.map((round): Round => {
         const roundLogLines = round.split("\n");
 
@@ -261,4 +263,26 @@ export const logToHalves = (text: string): Half[] => {
     });
 
   return mappedRounds;
+};
+
+export const logToMatch = (text: string): Match => {
+  const lastMatchStartIndex = text.lastIndexOf("Match_Start");
+  if (lastMatchStartIndex !== -1) {
+    text = text.slice(lastMatchStartIndex);
+    console.log(text[0]);
+  }
+
+  const halves = logToHalves(text);
+  const winner = determineWinnerByRounds(halves.flatMap((half) => half.rounds));
+  const scoreboard = logToScoreboard(text);
+  const map = determineMap(text);
+
+  return {
+    map,
+    halves,
+    winner: {
+      team: winner,
+    },
+    scoreboard,
+  };
 };

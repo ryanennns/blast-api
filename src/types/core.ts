@@ -40,6 +40,7 @@ type Half = {
 };
 
 interface Match {
+  map: string;
   halves: Half[];
   winner: {
     team: string;

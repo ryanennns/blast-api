@@ -13,8 +13,8 @@ datasource db {
 
 model Match {
   id        String    @id @default(uuid())
-  createdAt DateTime  @default(now())
   map       String
+  createdAt DateTime  @default(now())
   rounds    Round[]
   players   Player[]
 }
