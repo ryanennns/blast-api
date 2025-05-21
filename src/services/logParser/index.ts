@@ -237,6 +237,7 @@ export const logToHalves = (text: string): Half[] => {
     );
   }
 
+  let roundCount = 0;
   const mappedRounds: Half[] = halves
     .map((half: string[]) =>
       half.map((round): Round => {
@@ -260,7 +261,9 @@ export const logToHalves = (text: string): Half[] => {
         const teams = determineRoundTeams(roundLogLines);
         const roundWinner = determineRoundWinner(roundLogLines);
 
+        roundCount++;
         return {
+          number: roundCount,
           killFeed,
           assistFeed,
           flashAssistFeed,
@@ -271,8 +274,6 @@ export const logToHalves = (text: string): Half[] => {
     )
     .map((half: Round[]): Half => {
       const { T, CT } = half[0].teams;
-
-      console.log(JSON.stringify(half.map((h) => h.teams)));
 
       return {
         T,

@@ -152,8 +152,6 @@ describe("logToRounds", () => {
 
     const halves = logToHalves(log);
 
-    console.log(halves);
-
     expect(halves).toHaveLength(2);
     expect(halves[0].T).toBe(terroristTeam);
     expect(halves[0].CT).toBe(ctTeam);

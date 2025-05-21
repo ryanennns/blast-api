@@ -2,7 +2,8 @@ import express from "express";
 import cors from "cors";
 import multer from "multer";
 import * as fs from "node:fs";
-import { logToHalves, logToMatch, logToScoreboard } from "./services/logParser";
+import { logToMatch } from "./services/logParser";
+import { saveParsedMatch } from "./services/saveParsedMatch";
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
@@ -15,11 +16,13 @@ app.get("/", (req, res) => {
   });
 });
 
-app.post("/upload", upload.single("logFile"), (req, res) => {
+app.post("/upload", upload.single("logFile"), async (req, res) => {
   const path = req?.file?.path ?? "";
   const rawLog = fs.readFileSync(path, "utf-8");
 
   const match = logToMatch(rawLog);
+
+  await saveParsedMatch(match);
 
   fs.unlinkSync(path);
   res.json({ match });

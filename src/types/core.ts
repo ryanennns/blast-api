@@ -20,9 +20,7 @@ export interface Assist {
 }
 
 export interface Round {
-  killFeed: Kill[];
-  assistFeed: Assist[];
-  flashAssistFeed: Assist[];
+  number: number;
   roundWinner: {
     team: TeamRole;
     method: "kills" | "bomb" | "defusal";
@@ -31,6 +29,9 @@ export interface Round {
     T: string;
     CT: string;
   };
+  killFeed: Kill[];
+  assistFeed: Assist[];
+  flashAssistFeed: Assist[];
 }
 
 export interface Half {
