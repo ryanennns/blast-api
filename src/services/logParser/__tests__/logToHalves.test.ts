@@ -1,4 +1,4 @@
-import { logToRounds } from "../index.ts";
+import { logToHalves } from "../index.ts";
 
 const targetBombed = `11/28/2021 - 20:05:53: Team "TERRORIST" triggered "SFUI_Notice_Target_Bombed" (CT "6") (T "1")`;
 const bombDefused = `11/28/2021 - 20:45:36: Team "CT" triggered "SFUI_Notice_Bomb_Defused" (CT "2") (T "0")`;
@@ -8,7 +8,7 @@ const tsWin = `11/28/2021 - 21:07:42: Team "TERRORIST" triggered "SFUI_Notice_Te
 describe("logToRounds", () => {
   it("should throw if no Match_Start is found", () => {
     const invalidLog = "snickers not a log";
-    expect(() => logToRounds(invalidLog)).toThrow(
+    expect(() => logToHalves(invalidLog)).toThrow(
       "Match_Start not found in log",
     );
   });
@@ -26,7 +26,7 @@ describe("logToRounds", () => {
       11/28/2021 - 20:03:42: Match pause is enabled - mp_halftime_pausematch
       `;
 
-    expect(() => logToRounds(log)).toThrow(
+    expect(() => logToHalves(log)).toThrow(
       "Log could not be parsed into two halves; please check source.",
     );
   });
@@ -39,7 +39,7 @@ describe("logToRounds", () => {
       11/28/2021 - 20:03:22: World triggered "Round_End"
       `;
 
-    expect(() => logToRounds(log)).toThrow(
+    expect(() => logToHalves(log)).toThrow(
       "Log could not be parsed into two halves; please check source.",
     );
   });
@@ -57,7 +57,7 @@ describe("logToRounds", () => {
       11/28/2021 - 20:07:17: Game Over: competitive 1092904694 de_nuke score 6:16 after 50 min
     `;
 
-    const halves = logToRounds(log);
+    const halves = logToHalves(log);
     expect(halves).toHaveLength(2);
   });
 
@@ -77,11 +77,11 @@ describe("logToRounds", () => {
       11/28/2021 - 20:07:17: Game Over: competitive 1092904694 de_nuke score 6:16 after 50 min
     `;
 
-    const halves = logToRounds(log);
+    const halves = logToHalves(log);
 
     expect(halves).toHaveLength(2);
 
-    const firstRound = halves[0][0];
+    const firstRound = halves[0].rounds[0];
 
     expect(firstRound.killFeed[0]).toEqual({
       killer: "Perfecto",
@@ -120,15 +120,42 @@ describe("logToRounds", () => {
       11/28/2021 - 20:06:22: World triggered "Round_End"
     `;
 
-      const halves = logToRounds(log);
+      const halves = logToHalves(log);
 
       expect(halves).toHaveLength(2);
 
-      const firstRound = halves[0][0];
+      const firstRound = halves[0].rounds[0];
       expect(firstRound.roundWinner).toEqual({
         team: expectedWinner,
         method: expectedMethod,
       });
     },
   );
+
+  it("should parse team names correctly", () => {
+    const terroristTeam = "NAVI GGBET";
+    const ctTeam = "TeamVitality";
+
+    const log = `
+      11/28/2021 - 20:00:23: World triggered "Match_Start" on "de_nuke"
+      11/28/2021 - 20:45:36: MatchStatus: Team playing "CT": ${ctTeam}
+      11/28/2021 - 20:45:36: MatchStatus: Team playing "TERRORIST": ${terroristTeam}
+      11/28/2021 - 20:01:08: World triggered "Round_Start"
+      ${targetBombed}
+      11/28/2021 - 20:03:22: World triggered "Round_End"
+      11/28/2021 - 20:03:42: Match pause is enabled - mp_halftime_pausematch
+      11/28/2021 - 20:04:08: World triggered "Round_Start"
+      ${targetBombed}
+      11/28/2021 - 20:06:22: World triggered "Round_End"
+      11/28/2021 - 20:07:17: Game Over: competitive 1092904694 de_nuke score 6:16 after 50 min
+    `;
+
+    const halves = logToHalves(log);
+
+    console.log(halves);
+
+    expect(halves).toHaveLength(2);
+    expect(halves[0].T).toBe(terroristTeam);
+    expect(halves[0].CT).toBe(ctTeam);
+  });
 });

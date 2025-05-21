@@ -10,4 +10,7 @@ export default {
       },
     ],
   },
+  moduleNameMapper: {
+    "^@prisma$": "<rootDir>/prisma/generated/prisma", // 👈 match your tsconfig
+  },
 };

@@ -11,27 +11,6 @@ import {
   TERRORISTS_WIN_INDICATOR,
 } from "./const.ts";
 
-interface ScoreboardRow {
-  kills: number;
-  deaths: number;
-  assists: number;
-  flashAssists: number;
-}
-
-interface Kill {
-  killer: string;
-  killed: string;
-  weapon: string;
-  headshot: boolean;
-}
-
-interface Assist {
-  assister: string;
-  killed: string;
-}
-
-type Team = "T" | "CT";
-
 const parseKillLog = (line: string): Kill | null => {
   const match = line.match(KILL_REGEX);
 
@@ -113,7 +92,7 @@ const scoreboardFromFeeds = (
 const determineRoundWinner = (
   round: string[],
 ): {
-  team: Team;
+  team: TeamRole;
   method: "kills" | "bomb" | "defusal";
 } => {
   const terroristsWinByKills = round.some((line) =>
@@ -139,10 +118,12 @@ const determineRoundWinner = (
     : { team: "CT", method: ctsWinByKills ? "kills" : "defusal" };
 };
 
-const determineRoundTeams = (round: string[]): Record<Team, string> => {
+const determineRoundTeams = (round: string[]): Record<TeamRole, string> => {
   const [_a, ctTeam] = round.join("\n").match(CT_TEAM_REGEX) ?? [];
   const [_b, terroristTeam] =
     round.join("\n").match(TERRORIST_TEAM_REGEX) ?? [];
+
+  console.log(round);
 
   return {
     T: terroristTeam,
@@ -159,24 +140,63 @@ export const logToScoreboard = (text: string) => {
   const logLines = text.split("\n");
 
   const killFeed = logLines
-      .filter((l) => l.match(KILL_REGEX))
-      .map(parseKillLog)
-      .filter((k) => k !== null);
+    .filter((l) => l.match(KILL_REGEX))
+    .map(parseKillLog)
+    .filter((k) => k !== null);
 
   const assistFeed = logLines
-      .filter((l) => l.match(ASSIST_REGEX))
-      .map(parseAssistLog)
-      .filter((a) => a !== null);
+    .filter((l) => l.match(ASSIST_REGEX))
+    .map(parseAssistLog)
+    .filter((a) => a !== null);
 
   const flashAssistFeed = logLines
-      .filter((l) => l.match(FLASH_ASSIST_REGEX))
-      .map(parseFlashAssistLog)
-      .filter((a) => a !== null);
+    .filter((l) => l.match(FLASH_ASSIST_REGEX))
+    .map(parseFlashAssistLog)
+    .filter((a) => a !== null);
 
   return scoreboardFromFeeds(killFeed, assistFeed, flashAssistFeed);
 };
 
-export const logToRounds = (text: string) => {
+export const determineWinnerByRounds = (rounds: Round[]) => {
+  const { T, CT } = rounds[0].teams;
+  const teams: Record<string, number> = {
+    [T]: 0,
+    [CT]: 0,
+  };
+
+  rounds.forEach((round) => {
+    const roundWinningTeam = round.teams[round.roundWinner.team];
+    teams[roundWinningTeam]++;
+  });
+
+  if (Object.values(teams).length !== 2) {
+    throw new Error(
+      "Log could not be parsed into two teams; please check source.",
+    );
+  }
+
+  const [winner] = Object.entries(teams).sort((a, b) => {
+    return b[1] - a[1];
+  })[0];
+
+  return winner;
+};
+
+export const logToMatch = (text: string): Match => {
+  const halves = logToHalves(text);
+  const winner = determineWinnerByRounds(halves.flatMap((half) => half.rounds));
+  const scoreboard = logToScoreboard(text);
+
+  return {
+    halves,
+    winner: {
+      team: winner,
+    },
+    scoreboard,
+  };
+};
+
+export const logToHalves = (text: string): Half[] => {
   const lastMatchStartIndex = text.lastIndexOf("Match_Start");
 
   if (lastMatchStartIndex === -1) {
@@ -198,37 +218,47 @@ export const logToRounds = (text: string) => {
     );
   }
 
-  const mappedRounds = halves.map((half) => {
-    return half.map((round) => {
-      const roundLogLines = round.split("\n");
+  const mappedRounds: Half[] = halves
+    .map((half) =>
+      half.map((round): Round => {
+        const roundLogLines = round.split("\n");
 
-      const killFeed = roundLogLines
-        .filter((l) => l.match(KILL_REGEX))
-        .map(parseKillLog)
-        .filter((k) => k !== null);
+        const killFeed = roundLogLines
+          .filter((l) => l.match(KILL_REGEX))
+          .map(parseKillLog)
+          .filter((k) => k !== null);
 
-      const assistFeed = roundLogLines
-        .filter((l) => l.match(ASSIST_REGEX))
-        .map(parseAssistLog)
-        .filter((a) => a !== null);
+        const assistFeed = roundLogLines
+          .filter((l) => l.match(ASSIST_REGEX))
+          .map(parseAssistLog)
+          .filter((a) => a !== null);
 
-      const flashAssistFeed = roundLogLines
-        .filter((l) => l.match(FLASH_ASSIST_REGEX))
-        .map(parseFlashAssistLog)
-        .filter((a) => a !== null);
+        const flashAssistFeed = roundLogLines
+          .filter((l) => l.match(FLASH_ASSIST_REGEX))
+          .map(parseFlashAssistLog)
+          .filter((a) => a !== null);
 
-      const teams = determineRoundTeams(roundLogLines);
-      const roundWinner = determineRoundWinner(roundLogLines);
+        const teams = determineRoundTeams(roundLogLines);
+        const roundWinner = determineRoundWinner(roundLogLines);
+
+        return {
+          killFeed,
+          assistFeed,
+          flashAssistFeed,
+          roundWinner,
+          teams,
+        };
+      }),
+    )
+    .map((half: Round[]): Half => {
+      const { T, CT } = half[0].teams;
 
       return {
-        killFeed,
-        assistFeed,
-        flashAssistFeed,
-        roundWinner,
-        teams,
+        T,
+        CT,
+        rounds: half,
       };
     });
-  });
 
   return mappedRounds;
 };
