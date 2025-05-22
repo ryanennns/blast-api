@@ -1,4 +1,4 @@
-import { determineWinnerByRounds } from "../index";
+import { determineScorelineByRounds } from "../index";
 import { Round } from "../../../types/core";
 
 describe("determineWinnerByRounds", () => {
@@ -34,7 +34,7 @@ describe("determineWinnerByRounds", () => {
       },
     ];
 
-    expect(() => determineWinnerByRounds(rounds)).toThrow(
+    expect(() => determineScorelineByRounds(rounds)).toThrow(
       "Log could not be parsed into two teams; please check source.",
     );
   });
@@ -57,7 +57,7 @@ describe("determineWinnerByRounds", () => {
       },
     ];
 
-    expect(() => determineWinnerByRounds(rounds)).toThrow(
+    expect(() => determineScorelineByRounds(rounds)).toThrow(
       "Log could not be parsed into two teams; please check source.",
     );
   });
@@ -110,7 +110,7 @@ describe("determineWinnerByRounds", () => {
       },
     ];
 
-    const result = determineWinnerByRounds(rounds);
+    const result = determineScorelineByRounds(rounds);
 
     expect(result).toEqual(teamOne);
   });

@@ -46,6 +46,14 @@ export interface Half {
 export interface Match {
   map: string;
   halves: Half[];
+  teams: {
+    a: string;
+    b: string;
+  }
+  score: {
+    a: number;
+    b: number;
+  }
   winner: {
     team: string;
   };

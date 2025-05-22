@@ -11,6 +11,10 @@ export const saveParsedMatch = async (match: Match): Promise<string | null> => {
         data: {
           map: match.map,
           winner: match.winner.team,
+          team_a: match.teams.a,
+          team_b: match.teams.b,
+          team_a_score: match.score.a,
+          team_b_score: match.score.b,
         },
       });
 

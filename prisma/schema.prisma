@@ -9,12 +9,16 @@ datasource db {
 }
 
 model Match {
-  id         String      @id @default(uuid())
-  map        String
-  rounds     Round[]
-  halves     Half[]
-  winner     String
-  scoreboard Scoreboard?
+  id           String      @id @default(uuid())
+  map          String
+  team_a       String
+  team_b       String
+  team_a_score Int
+  team_b_score Int
+  winner       String
+  rounds       Round[]
+  halves       Half[]
+  scoreboard   Scoreboard?
 }
 
 model Half {

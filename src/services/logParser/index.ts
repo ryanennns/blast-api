@@ -186,7 +186,7 @@ export const determineMap = (text: string): string => {
   return mapName;
 };
 
-export const determineWinnerByRounds = (rounds: Round[]) => {
+export const determineScorelineByRounds = (rounds: Round[]) => {
   const { T, CT } = rounds[0].teams;
   const teams: Record<string, number> = {
     [T]: 0,
@@ -204,9 +204,14 @@ export const determineWinnerByRounds = (rounds: Round[]) => {
     );
   }
 
-  const [winner] = Object.entries(teams).sort((a, b) => {
+  const winner = Object.entries(teams).sort((a, b) => {
     return b[1] - a[1];
-  })[0];
+  }).map(([team, score]) => {
+    return {
+      team,
+      score,
+    }
+  });
 
   return winner;
 };
@@ -336,15 +341,23 @@ export const logToHalves = (text: string): Half[] => {
 
 export const logToMatch = (text: string): Match => {
   const halves = logToHalves(text);
-  const winner = determineWinnerByRounds(halves.flatMap((half) => half.rounds));
+  const scoreline = determineScorelineByRounds(halves.flatMap((half) => half.rounds));
   const scoreboard = logToScoreboard(text);
   const map = determineMap(text);
 
   return {
     map,
     halves,
+    teams: {
+      a: scoreline[0].team,
+      b: scoreline[1].team,
+    },
+    score: {
+      a: scoreline[0].score,
+      b: scoreline[1].score,
+    },
     winner: {
-      team: winner,
+      team: scoreline[0].team,
     },
     scoreboard,
   };
