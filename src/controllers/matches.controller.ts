@@ -43,6 +43,32 @@ export const getMatch = async (req: Request, res: Response) => {
   res.json({ match: { ...match, scoreboard, round_count } });
 };
 
+export const getMatchScoreboard = async (req: Request, res: Response) => {
+  const scoreboard = await prisma.scoreboard.findFirst({
+    where: {
+      matchId: req.params.uuid,
+    },
+    include: {
+      scoreboardRows: {
+        select: {
+          player: true,
+          team: true,
+          kills: true,
+          deaths: true,
+          assists: true,
+          flashAssists: true,
+        },
+      },
+    },
+  });
+
+  if (!scoreboard) {
+    res.status(404).json({ error: "Scoreboard not found" });
+  }
+
+  res.send({ scoreboard });
+};
+
 export const getMatchKills = async (req: Request, res: Response) => {
   const kills = await prisma.kill.findMany({
     where: {

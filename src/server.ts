@@ -9,6 +9,7 @@ import {
   getMatchHalves,
   getMatchKills,
   getMatchRounds,
+  getMatchScoreboard,
   listMatches,
 } from "./controllers/matches.controller";
 
@@ -40,6 +41,7 @@ app.post("/upload", upload.single("logFile"), async (req, res) => {
 
 app.get("/matches", listMatches);
 app.get("/matches/:uuid", getMatch);
+app.get("/matches/:uuid/scoreboard", getMatchScoreboard);
 app.get("/matches/:uuid/kills", getMatchKills);
 app.get("/matches/:uuid/rounds", getMatchRounds);
 app.get("/matches/:uuid/halves", getMatchHalves);
