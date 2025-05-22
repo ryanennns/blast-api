@@ -100,6 +100,20 @@ export const getMatchRounds = async (req: Request, res: Response) => {
           order: true,
         },
       },
+      assists: {
+        select: {
+          assister: true,
+          killed: true,
+          order: true,
+        },
+      },
+      flashAssists: {
+        select: {
+          assister: true,
+          killed: true,
+          order: true,
+        },
+      },
     },
   });
 
