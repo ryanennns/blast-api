@@ -112,6 +112,9 @@ describe("determineWinnerByRounds", () => {
 
     const result = determineScorelineByRounds(rounds);
 
-    expect(result).toEqual(teamOne);
+    expect(result).toEqual([
+      { score: 3, team: "Team One" },
+      { score: 0, team: "Team Two" },
+    ]);
   });
 });

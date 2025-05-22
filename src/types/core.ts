@@ -49,11 +49,11 @@ export interface Match {
   teams: {
     a: string;
     b: string;
-  }
+  };
   score: {
     a: number;
     b: number;
-  }
+  };
   winner: {
     team: string;
   };

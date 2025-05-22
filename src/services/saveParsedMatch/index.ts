@@ -1,13 +1,25 @@
 import { PrismaClient } from "../../../prisma/generated/prisma/default";
 import { Match } from "../../types/core";
 
+interface DatabaseMatch {
+  id: string;
+  map: string;
+  team_a: string;
+  team_b: string;
+  team_a_score: number;
+  team_b_score: number;
+  winner: string;
+}
+
 const prisma = new PrismaClient();
-export const saveParsedMatch = async (match: Match): Promise<string | null> => {
-  let matchId: string | null = null;
+export const saveParsedMatch = async (
+  match: Match,
+): Promise<DatabaseMatch | null> => {
+  let dbMatch: DatabaseMatch | null = null;
 
   try {
     await prisma.$transaction(async (tx) => {
-      const dbMatch = await tx.match.create({
+      dbMatch = await tx.match.create({
         data: {
           map: match.map,
           winner: match.winner.team,
@@ -30,8 +42,6 @@ export const saveParsedMatch = async (match: Match): Promise<string | null> => {
           scoreboardId: dbScoreboard.id,
         })),
       });
-
-      matchId = dbMatch.id;
 
       for (const half of match.halves) {
         const dbHalf = await tx.half.create({
@@ -88,5 +98,5 @@ export const saveParsedMatch = async (match: Match): Promise<string | null> => {
     console.error("Error saving match:", error);
   }
 
-  return matchId;
+  return dbMatch;
 };

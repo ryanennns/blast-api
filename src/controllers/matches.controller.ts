@@ -4,9 +4,7 @@ import { PrismaClient } from "../../prisma/generated/prisma/default";
 const prisma = new PrismaClient();
 
 export const listMatches = async (req: Request, res: Response) => {
-  const matches = await prisma.match.findMany({
-
-  });
+  const matches = await prisma.match.findMany({});
 
   res.json({ matches });
 };
@@ -111,8 +109,6 @@ export const getMatchHalves = async (req: Request, res: Response) => {
       };
     }),
   );
-
-  console.log(mappedHalves);
 
   res.send({ halves: mappedHalves });
 };

@@ -8,7 +8,8 @@ import {
   getMatch,
   getMatchHalves,
   getMatchKills,
-  getMatchRounds, listMatches,
+  getMatchRounds,
+  listMatches,
 } from "./controllers/matches.controller";
 
 const app = express();
@@ -28,12 +29,12 @@ app.post("/upload", upload.single("logFile"), async (req, res) => {
 
   const match = logToMatch(rawLog);
 
-  const match_id = await saveParsedMatch(match);
+  const dbMatch = await saveParsedMatch(match);
 
   fs.unlinkSync(path);
 
-  match_id
-    ? res.json({ match_id })
+  dbMatch
+    ? res.json({ match: dbMatch })
     : res.status(500).json({ error: "Failed to save match" });
 });
 

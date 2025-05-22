@@ -79,7 +79,6 @@ const scoreboardFromFeeds = (
 ): ScoreboardRow[] => {
   const scoreboardMap = new Map<string, ScoreboardRow>();
 
-  console.log(killFeed);
   killFeed.forEach(({ killer, killed, killerTeam, killedTeam }) => {
     if (!scoreboardMap.has(killer)) {
       scoreboardMap.set(killer, {
@@ -204,14 +203,16 @@ export const determineScorelineByRounds = (rounds: Round[]) => {
     );
   }
 
-  const winner = Object.entries(teams).sort((a, b) => {
-    return b[1] - a[1];
-  }).map(([team, score]) => {
-    return {
-      team,
-      score,
-    }
-  });
+  const winner = Object.entries(teams)
+    .sort((a, b) => {
+      return b[1] - a[1];
+    })
+    .map(([team, score]) => {
+      return {
+        team,
+        score,
+      };
+    });
 
   return winner;
 };
@@ -341,7 +342,9 @@ export const logToHalves = (text: string): Half[] => {
 
 export const logToMatch = (text: string): Match => {
   const halves = logToHalves(text);
-  const scoreline = determineScorelineByRounds(halves.flatMap((half) => half.rounds));
+  const scoreline = determineScorelineByRounds(
+    halves.flatMap((half) => half.rounds),
+  );
   const scoreboard = logToScoreboard(text);
   const map = determineMap(text);
 
